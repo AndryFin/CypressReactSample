@@ -1,5 +1,6 @@
 import React, {useState, useEffect } from "react";
 import "./App.scss";
+import LoadingOverlay from 'react-loading-overlay';
 
 function App() {
   const [count, setCount] = useState(null);
@@ -7,6 +8,8 @@ function App() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(true);
   const submit = () => {
+	setSuccess();
+	setError();
     fetch("http://localhost:3002/count", {
       method: "POST",
       body: JSON.stringify(count),
@@ -26,35 +29,41 @@ function App() {
       getData()
 	},[]);
   return (
-    <div className="app" data-testid="app">
-      <div className="container">
-        <div className="counter">
-          <div 
-		    className="btn"
-            data-testid="decrement"
-            onClick={() => setCount((count) => count - 1)}
-		  >
-		    -
+  <div className="app" data-testid="app">
+	  <LoadingOverlay 
+	  active={loading}
+	  spinner
+	  text='Getting the initial count...'
+	  >
+		  <div className="container">
+			<div className="counter">
+			  <div 
+				className="btn"
+				data-testid="decrement"
+				onClick={() => setCount((count) => count - 1)}
+			  >
+				-
+			  </div>
+			  <span>{count}</span>
+			  <div
+				className="btn"
+				data-testid="increment"
+				onClick={() => setCount((count) => count + 1)}
+			  >
+				+
+			  </div>
+			</div>
+			<button type="submit" disabled={count < -10 || count > 20 ? true : false} onClick={submit}>
+			  click me
+			</button>
+			{error && (
+			  <span className="error">
+				There was an error submitted your count!
+			  </span>
+			)}
+			{success && <span className="success">Count submitted</span>}
 		  </div>
-		  {loading ? <span>wait..</span> : <span>{count}</span>}
-          <div
-            className="btn"
-            data-testid="increment"
-            onClick={() => setCount((count) => count + 1)}
-          >
-            +
-          </div>
-        </div>
-        <button type="submit" disabled={count < -10 || count > 20 ? true : false} onClick={submit}>
-          click me
-        </button>
-        {error && (
-          <span className="error">
-            There was an error submitted your count!
-          </span>
-        )}
-        {success && <span className="success">Count submitted</span>}
-      </div>
+	  </LoadingOverlay>
     </div>
   );
 }
